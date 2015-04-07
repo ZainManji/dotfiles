@@ -20,14 +20,6 @@ set number
 set spell spelllang=en_us
 
 
-"++++++++++++++++++++
-"++ Load plugins ++++
-"++++++++++++++++++++
-
-"Pathogen (https://github.com/tpope/vim-pathogen)
-call pathogen#infect()
-
-
 "++++++++++++++++
 "++ Mappings ++++
 "++++++++++++++++
@@ -84,7 +76,6 @@ let g:solarized_termcolors=256
 let g:solarized_visibility = "low" "Could be low, normal or high
 let g:solarized_contrast = "high"
 set background=dark
-colorscheme solarized
 
 "colorscheme ron "In case we're out of Solarized some day
 
@@ -211,73 +202,3 @@ set backspace=indent,eol,start
 
 "Manual folds, backed up and restored
 set foldmethod=manual
-
-
-"+++++++++++++++++++++
-"++ Yelp specific ++++
-"+++++++++++++++++++++
-
-let git_email = substitute(system('echo $GIT_COMMITTER_EMAIL'), '\n', '', '')
-if git_email == 'abrousse@yelp.com'
-  "Hopefully ctags
-  set tags=~/tags;/
-  map <c-g> :RopeGotoDefinition<CR>
-
-  "Internal pastebin
-  map <leader>pb :w !pastebinit -<CR>
-
-  "Drop a debugger FUCK IT!
-  ab fuckit import ipdb; ipdb.set_trace()
-
-  "This is Yelp's style
-  set noexpandtab
-  set softtabstop=4
-  set tabstop=4
-  set shiftwidth=4
-
-  "Stop caring about compiled crap
-  set wildignore+=*.o,*.obj,.git,*.pyc,*templates/*.py,#*#,build/*
-
-  "Tabspire setup (wstyke.com/tabspire)
-  let g:vimspire_map_keys=0
-  let g:tabspire_client_id="NONO"
-  noremap <leader>l :OpenURL trac/ticket/<cword><CR>
-  noremap <M-o> :OpenTabByName 
-  noremap <Leader>M :ReloadTabByName 
-  noremap <Leader>j :ReloadFocusMark 
-  noremap <Leader>J :FocusMark 
-  noremap <M-R> :ReloadCurrentTab<CR>
-  noremap <c-k> :OpenGoogleSearch 
-  noremap <c-l> :OpenURL 
-  vnoremap <Leader>pb :call OpenPB()<CR>
-  noremap <c-i> :FocusCurrentWindow<CR>
-
-  "CommandT stuff (https://github.com/wincent/Command-T)
-  "Yes, Yelp has a large codebase.
-  let g:CommandTMaxFiles=100000
-
-  "BEGIN TESTIFY SERVER
-  function! StoreTestPath(filename, lineno)
-    let g:t= a:filename
-    let g:f = system("~/.vim/testifyserver/test_finder.py ".shellescape(a:filename)." ".shellescape(a:lineno))
-    let g:f=substitute(strtrans(g:f),'\^@',' ','g')
-    echo g:t g:f
-  endfun
-
-  function! RunTests(test_name, test_path)
-    call TellTestServerToReloadFile(a:test_name)
-    let args = a:test_name." ".a:test_path
-    let l:t = system("~/.vim/testifyserver/runtests.py ".shellescape(args).' & 2>&1 > /dev/null')
-  endfun
-
-  map <Leader>s :call StoreTestPath(expand("%"), line("."))<CR>
-  map <Leader>r :call RunTests(g:t, g:f)<CR>
-
-  function! TellTestServerToReloadFile(filename)
-    let l:x = system('~/.vim/testifyserver/reloadfile.py '.shellescape(a:filename).' & 2>&1 > /dev/null')
-  endfun
-  map <Leader>r :call TellTestServerToReloadFile(expand("%"))<CR>
-  autocmd BufWritePre * :call TellTestServerToReloadFile(expand("%"))
-  "END TESTIFY SERVER
-
-endif
